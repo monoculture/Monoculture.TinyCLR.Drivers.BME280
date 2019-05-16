@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.271
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2A509A02-BABD-4022-B57E-E24681179BC1}"
+	ProjectSection(SolutionItems) = preProject
+		Build\build-pipeline.yml = Build\build-pipeline.yml
+		Build\UpdateAssemblyInfo.ps1 = Build\UpdateAssemblyInfo.ps1
+		Build\UpdateNugetVersion.ps1 = Build\UpdateNugetVersion.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{2CF323FD-D51E-43D0-B2C9-DB21C2957790}"
+	ProjectSection(SolutionItems) = preProject
+		Docs\BST-BME280-DS002.pdf = Docs\BST-BME280-DS002.pdf
+		Docs\BST-BME280-FL000.pdf = Docs\BST-BME280-FL000.pdf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sources", "Sources", "{6BEC9F47-1EFE-4918-BDD2-7D0AED6C78C5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3840A7D6-DCF2-4D94-A15A-74A28FBCE0B0}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monoculture.TinyCLR.Drivers.BME280", "Source\Monoculture.TinyCLR.Drivers.BME280\Monoculture.TinyCLR.Drivers.BME280.csproj", "{423F6596-3EE2-48A4-825B-0D31BAA2EEB5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monoculture.TinyCLR.Drivers.BME280.Demo", "Source\Monoculture.TinyCLR.Drivers.BME280.Demo\Monoculture.TinyCLR.Drivers.BME280.Demo.csproj", "{FC199A25-EC35-4F35-A6B2-4975DA5E858E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{423F6596-3EE2-48A4-825B-0D31BAA2EEB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{423F6596-3EE2-48A4-825B-0D31BAA2EEB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{423F6596-3EE2-48A4-825B-0D31BAA2EEB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{423F6596-3EE2-48A4-825B-0D31BAA2EEB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC199A25-EC35-4F35-A6B2-4975DA5E858E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC199A25-EC35-4F35-A6B2-4975DA5E858E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC199A25-EC35-4F35-A6B2-4975DA5E858E}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{FC199A25-EC35-4F35-A6B2-4975DA5E858E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC199A25-EC35-4F35-A6B2-4975DA5E858E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC199A25-EC35-4F35-A6B2-4975DA5E858E}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{423F6596-3EE2-48A4-825B-0D31BAA2EEB5} = {6BEC9F47-1EFE-4918-BDD2-7D0AED6C78C5}
+		{FC199A25-EC35-4F35-A6B2-4975DA5E858E} = {6BEC9F47-1EFE-4918-BDD2-7D0AED6C78C5}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {11D362FE-3050-43FA-AF2E-1FA7B511338C}
+	EndGlobalSection
+EndGlobal
