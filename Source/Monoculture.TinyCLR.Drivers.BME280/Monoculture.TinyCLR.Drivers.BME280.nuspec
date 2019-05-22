@@ -7,7 +7,7 @@
 	<requireLicenseAcceptance>true</requireLicenseAcceptance>
     <authors>Monoculture</authors>
     <projectUrl>https://github.com/monoculture/Monoculture.TinyCLR.Drivers.BME280</projectUrl>
-    <description>TinyCLR library for the BME280 Humidity, Barometric Pressure + Temp sensor.</description>
+    <description>TinyCLR library for the BME280 Humidity, Barometric Pressure + Temp sensor. Supports SPI and I2C</description>
     <copyright>Copyright ©2019 Monoculture</copyright>
     <tags>TinyCLR TinyCLROS BME280</tags>
   </metadata>

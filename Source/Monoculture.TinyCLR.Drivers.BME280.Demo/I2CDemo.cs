@@ -1,5 +1,6 @@
 ﻿/*
- *
+ * Author: Monoculture 2019
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,7 +14,6 @@
  * limitations under the License.
  */
 
-using System.Threading;
 using System.Diagnostics;
 
 using GHIElectronics.TinyCLR.Pins;
@@ -21,56 +21,33 @@ using GHIElectronics.TinyCLR.Devices.I2c;
 
 namespace Monoculture.TinyCLR.Drivers.BME280.Demo
 {
-    public class MainX
+    public class I2CDemo
     {
-        private bool _isStopped;
-
-        private BME280Driver _device;
-
-        private static void Main()
-        {
-           new MainX().Run();
-        }
-
-        public void Run()
+        public static void Execute()
         {
             var settings = BME280Driver.GetI2CConnectionSettings(BME280Address.Primary);
 
             var controller = I2cController.FromName(G120E.I2cBus.I2c0);
 
+
             var device = controller.GetDevice(settings);
 
-            _device = new BME280Driver(device);
+            var driver = new BME280Driver(device);
+                   
+            driver.Initialize();
 
-            _device.Initialize();
-
-            _device.ChangeSettings(
+            driver.ChangeSettings(
                 BME280SensorMode.Forced,
                 BME280OverSample.X1,
                 BME280OverSample.X1,
                 BME280OverSample.X1,
                 BME280Filter.Off);
 
-            Loop();
+            driver.Read();
+
+            Debug.WriteLine("Pressure: " + driver.Pressure);
+            Debug.WriteLine("Humidity: " + driver.Humidity);
+            Debug.WriteLine("Temperature:" + driver.Temperature);
         }
-
-        private void Loop()
-        {
-            while (!_isStopped)
-            {
-                _device.Update();
-
-                Debug.WriteLine("Pressure: " + _device.Pressure);
-                Debug.WriteLine("Humidity: " + _device.Humidity);
-                Debug.WriteLine("Temperature:" + _device.Temperature);
-
-                Thread.Sleep(1000);
-            }
-        }
-
-        public void Stop()
-        {
-            _isStopped = true;
-        } 
     }
 }

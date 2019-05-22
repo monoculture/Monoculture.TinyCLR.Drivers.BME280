@@ -1,5 +1,6 @@
 ﻿/*
- *
+ * Author: Monoculture 2019
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +17,7 @@
 using System;
 using System.Threading;
 using GHIElectronics.TinyCLR.Devices.I2c;
+using GHIElectronics.TinyCLR.Devices.Spi;
 
 namespace Monoculture.TinyCLR.Drivers.BME280
 {
@@ -25,12 +27,23 @@ namespace Monoculture.TinyCLR.Drivers.BME280
         private int _rawHumidity;
         private int _rawPressure;
         private int _rawTemperature;
-        private readonly I2cDevice _device;
         private BME280CFData _calibration;
+        private readonly BME280BusWrapper _device;
 
         public BME280Driver(I2cDevice device)
         {
-            _device = device ?? throw new ArgumentNullException(nameof(device));
+            if(device == null)
+                throw new ArgumentNullException(nameof(device));
+
+            _device = new BME280BusWrapper(device);
+        }
+
+        public BME280Driver(SpiDevice device)
+        {
+            if (device == null)
+                throw new ArgumentNullException(nameof(device));
+
+            _device = new BME280BusWrapper(device);
         }
 
         public static I2cConnectionSettings GetI2CConnectionSettings(BME280Address address)
@@ -44,7 +57,22 @@ namespace Monoculture.TinyCLR.Drivers.BME280
             return settings;
         }
 
+        public static SpiConnectionSettings GetSpiConnectionSettings(int chipSelectLine)
+        {
+            var settings = new SpiConnectionSettings()
+            {
+                ChipSelectType = SpiChipSelectType.Gpio,
+                ChipSelectLine = chipSelectLine,
+                Mode = SpiMode.Mode0,
+                DataBitLength = 7
+            };
+
+            return settings;
+        }
+
         public bool IsInitialized { get; private set; }
+
+        public BME280BusType BusType => _device.BusType;
 
         public BME280Filter Filter { get; private set; } = BME280Filter.Off;
 
@@ -57,6 +85,7 @@ namespace Monoculture.TinyCLR.Drivers.BME280
         public BME280OverSample OsrHumidity { get; private set; } = BME280OverSample.X1;
 
         public BME280StandbyTime StandbyDuration { get; private set; } = BME280StandbyTime.Ms05;
+
 
         public void Initialize()
         {
@@ -162,6 +191,7 @@ namespace Monoculture.TinyCLR.Drivers.BME280
             BME280Filter filter = BME280Filter.Off,
             BME280StandbyTime standbyDuration = BME280StandbyTime.Ms05)
         {
+            Filter = filter;
             SensorMode = sensorMode;
             OsrPressure = osrPressure;
             OsrHumidity = osrHumidity;
@@ -197,7 +227,7 @@ namespace Monoculture.TinyCLR.Drivers.BME280
             Thread.Sleep(2);
         }
 
-        public void Update()
+        public void Read()
         {
             if(SensorMode == BME280SensorMode.Forced)
                 TakeForcedReading();

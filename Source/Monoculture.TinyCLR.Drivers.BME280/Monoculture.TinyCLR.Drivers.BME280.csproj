@@ -34,6 +34,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BME280BusType.cs" />
+    <Compile Include="BME280BusWrapper.cs" />
     <Compile Include="BME280Driver.cs" />
     <Compile Include="BME280Filter.cs" />
     <Compile Include="BME280Address.cs" />
@@ -52,6 +54,9 @@
     </Reference>
     <Reference Include="GHIElectronics.TinyCLR.Devices.I2c, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\GHIElectronics.TinyCLR.Devices.I2c.1.0.0\lib\net452\GHIElectronics.TinyCLR.Devices.I2c.dll</HintPath>
+    </Reference>
+    <Reference Include="GHIElectronics.TinyCLR.Devices.Spi, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\GHIElectronics.TinyCLR.Devices.Spi.1.0.0\lib\net452\GHIElectronics.TinyCLR.Devices.Spi.dll</HintPath>
     </Reference>
     <Reference Include="GHIElectronics.TinyCLR.Native, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\GHIElectronics.TinyCLR.Native.1.0.0\lib\net452\GHIElectronics.TinyCLR.Native.dll</HintPath>

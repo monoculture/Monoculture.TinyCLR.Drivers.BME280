@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-namespace Monoculture.TinyCLR.Drivers.BME280
+namespace Monoculture.TinyCLR.Drivers.BME280.Demo
 {
-    public enum BME280Filter : byte
+    public class Program
     {
-        Off = 0b000,
-        X2 = 0b001,
-        X4 = 0b010,
-        X8 = 0b011,
-        X16 = 0b100
+        private static void Main()
+        {
+           //I2CDemo.Execute();
+
+           SpiDemo.Execute();
+        }
     }
 }
