@@ -1,5 +1,6 @@
 ﻿/*
- *
+ * Author: Monoculture 2019
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -58,12 +59,12 @@ namespace Monoculture.TinyCLR.Drivers.BME280
 
         public static SpiConnectionSettings GetSpiConnectionSettings(int chipSelectLine)
         {
-            var settings = new SpiConnectionSettings
+            var settings = new SpiConnectionSettings()
             {
+                ChipSelectType = SpiChipSelectType.Gpio,
                 ChipSelectLine = chipSelectLine,
-                ClockFrequency = 500000,
                 Mode = SpiMode.Mode0,
-                DataBitLength = 8
+                DataBitLength = 7
             };
 
             return settings;
@@ -226,7 +227,7 @@ namespace Monoculture.TinyCLR.Drivers.BME280
             Thread.Sleep(2);
         }
 
-        public void Update()
+        public void Read()
         {
             if(SensorMode == BME280SensorMode.Forced)
                 TakeForcedReading();

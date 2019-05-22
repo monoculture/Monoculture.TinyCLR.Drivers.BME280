@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-namespace Monoculture.TinyCLR.Drivers.BME280
+namespace Monoculture.TinyCLR.Drivers.BME280.Demo
 {
-    public enum BME280BusType
+    public class Program
     {
-        I2C,
-        Spi
+        private static void Main()
+        {
+           //I2CDemo.Execute();
+
+           SpiDemo.Execute();
+        }
     }
 }

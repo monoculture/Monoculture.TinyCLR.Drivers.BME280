@@ -1,4 +1,22 @@
-﻿using GHIElectronics.TinyCLR.Devices.I2c;
+﻿/*
+ * Author: Monoculture 2019
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+using System;
+
+using GHIElectronics.TinyCLR.Devices.I2c;
 using GHIElectronics.TinyCLR.Devices.Spi;
 
 namespace Monoculture.TinyCLR.Drivers.BME280
@@ -51,14 +69,19 @@ namespace Monoculture.TinyCLR.Drivers.BME280
             }
             else
             {
-                SpiDevice.TransferSequential(
-                    writeBuffer, 
-                    writeOffset, 
-                    writeLength, 
-                    readBuffer, 
-                    readOffset, 
-                    readLength);
+                var _bufferSize = writeLength + readLength;
+
+                byte[] _readBuffer = new byte[_bufferSize];
+
+                byte[] _writeBuffer = new byte[_bufferSize];
+
+                Array.Copy(writeBuffer, writeOffset, _writeBuffer, 0, writeLength);
+
+                SpiDevice.TransferFullDuplex(_writeBuffer, _readBuffer);
+
+                Array.Copy(_readBuffer, writeLength, readBuffer, readOffset, readLength);
             }
         }
     }
+
 }
