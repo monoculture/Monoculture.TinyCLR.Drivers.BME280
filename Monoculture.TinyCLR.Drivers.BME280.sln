@@ -6,8 +6,8 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2A509A02-BABD-4022-B57E-E24681179BC1}"
 	ProjectSection(SolutionItems) = preProject
 		Build\build-pipeline.yml = Build\build-pipeline.yml
+		Build\SetPackageVersion.ps1 = Build\SetPackageVersion.ps1
 		Build\UpdateAssemblyInfo.ps1 = Build\UpdateAssemblyInfo.ps1
-		Build\UpdateNugetVersion.ps1 = Build\UpdateNugetVersion.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{2CF323FD-D51E-43D0-B2C9-DB21C2957790}"
