@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Monoculture.TinyCLR.Drivers.BME280.Demo.SpiDemo</StartupObject>
+    <StartupObject>Monoculture.TinyCLR.Drivers.BME280.Demo.I2CDemo</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="I2CDemo.cs" />
