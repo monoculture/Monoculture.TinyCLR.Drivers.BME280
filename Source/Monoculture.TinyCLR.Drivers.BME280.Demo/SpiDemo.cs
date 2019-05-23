@@ -15,7 +15,7 @@
  */
 
 using System.Diagnostics;
-
+using System.Threading;
 using GHIElectronics.TinyCLR.Pins;
 using GHIElectronics.TinyCLR.Devices.Spi;
 
@@ -23,7 +23,7 @@ namespace Monoculture.TinyCLR.Drivers.BME280.Demo
 {
     public class SpiDemo
     {
-        public static void Execute()
+        public static void Main()
         {
             var settings = BME280Driver.GetSpiConnectionSettings(G120E.GpioPin.P2_27);
 
@@ -42,11 +42,16 @@ namespace Monoculture.TinyCLR.Drivers.BME280.Demo
                 BME280OverSample.X1,
                 BME280Filter.Off);
 
-            driver.Read();
+            while (true)
+            {
+                driver.Read();
 
-            Debug.WriteLine("Pressure: " + driver.Pressure);
-            Debug.WriteLine("Humidity: " + driver.Humidity);
-            Debug.WriteLine("Temperature:" + driver.Temperature);
+                Debug.WriteLine("Pressure: " + driver.Pressure);
+                Debug.WriteLine("Humidity: " + driver.Humidity);
+                Debug.WriteLine("Temperature:" + driver.Temperature);
+
+                Thread.Sleep(1000);
+            }
         }
     }
 }

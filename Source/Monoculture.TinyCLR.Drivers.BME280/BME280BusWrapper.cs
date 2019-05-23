@@ -33,55 +33,76 @@ namespace Monoculture.TinyCLR.Drivers.BME280
             I2CDevice = device;
         }
 
-        public I2cDevice I2CDevice { get; }
+        private I2cDevice I2CDevice { get; }
 
-        public SpiDevice SpiDevice { get; }
+        private SpiDevice SpiDevice { get; }
 
         public BME280BusType BusType => SpiDevice == null ? BME280BusType.I2C : BME280BusType.Spi;
 
-        public void Write(byte[] writeBuffer)
+        public byte ReadRegister(byte address)
         {
-            WriteRead(writeBuffer, 0, writeBuffer.Length, null, 0, 0);
+            return ReadRegion(address, 1)[0];
         }
 
-        public void WriteRead(byte[] writeBuffer, byte[] readBuffer)
-        {
-            WriteRead(writeBuffer, 0, writeBuffer.Length, readBuffer, 0, readBuffer.Length);
-        }
-
-        public void WriteRead( 
-            byte[] writeBuffer, 
-            int writeOffset,
-            int writeLength,
-            byte[] readBuffer,
-            int readOffset,
-            int readLength)
+        public byte[] ReadRegion(byte address, int length)
         {
             if (BusType == BME280BusType.I2C)
             {
-                I2CDevice.WriteRead(
-                    writeBuffer,
-                    writeOffset,
-                    writeLength,
-                    readBuffer,
-                    readOffset,
-                    readLength);
+                var readBuffer = new byte[length];
+
+                var writeBuffer = new byte[] { address };
+
+                I2CDevice.WriteRead(writeBuffer, readBuffer);
+
+                return readBuffer;
             }
             else
             {
-                var _bufferSize = writeLength + readLength;
+                var bufferSize = length + 1;
 
-                byte[] _readBuffer = new byte[_bufferSize];
+                var txBuffer = new byte[bufferSize];
 
-                byte[] _writeBuffer = new byte[_bufferSize];
+                txBuffer[0] = (byte)(address | 0x80);
 
-                Array.Copy(writeBuffer, writeOffset, _writeBuffer, 0, writeLength);
+                byte[] rxBuffer = new byte[txBuffer.Length];
 
-                SpiDevice.TransferFullDuplex(_writeBuffer, _readBuffer);
+                SpiDevice.TransferFullDuplex(txBuffer, rxBuffer);
 
-                Array.Copy(_readBuffer, writeLength, readBuffer, readOffset, readLength);
+                var output = new byte[length];
+
+                Array.Copy(rxBuffer, 1, output, 0, output.Length);
+
+                return output;
+            }
+        }
+
+        public void WriteRegister(byte address, byte data)
+        {
+            WriteRegion(address, new byte[] { data });
+        }
+
+        public void WriteRegion(byte address, byte[] data)
+        {
+            if (BusType == BME280BusType.I2C)
+            {
+                var writeBuffer = new byte[data.Length + 1];
+
+                writeBuffer[0] = address;
+
+                Array.Copy(data, 0, writeBuffer, 1, data.Length);
+
+                I2CDevice.Write(writeBuffer);
+            }
+            else
+            {
+                var writeBuffer = new byte[data.Length + 1];
+
+                writeBuffer[0] = (byte) (address & ~0x80); 
+
+                Array.Copy(data, 0, writeBuffer, 1, data.Length);
+
+                SpiDevice.Write(writeBuffer);
             }
         }
     }
-
 }

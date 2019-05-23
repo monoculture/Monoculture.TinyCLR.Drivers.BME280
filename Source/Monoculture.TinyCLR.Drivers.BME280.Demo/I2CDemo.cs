@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+using System.Threading;
 using System.Diagnostics;
 
 using GHIElectronics.TinyCLR.Pins;
@@ -23,12 +24,11 @@ namespace Monoculture.TinyCLR.Drivers.BME280.Demo
 {
     public class I2CDemo
     {
-        public static void Execute()
+        public static void Main()
         {
             var settings = BME280Driver.GetI2CConnectionSettings(BME280Address.Primary);
 
             var controller = I2cController.FromName(G120E.I2cBus.I2c0);
-
 
             var device = controller.GetDevice(settings);
 
@@ -43,11 +43,16 @@ namespace Monoculture.TinyCLR.Drivers.BME280.Demo
                 BME280OverSample.X1,
                 BME280Filter.Off);
 
-            driver.Read();
+            while (true)
+            {
+                driver.Read();
 
-            Debug.WriteLine("Pressure: " + driver.Pressure);
-            Debug.WriteLine("Humidity: " + driver.Humidity);
-            Debug.WriteLine("Temperature:" + driver.Temperature);
+                Debug.WriteLine("Pressure: " + driver.Pressure);
+                Debug.WriteLine("Humidity: " + driver.Humidity);
+                Debug.WriteLine("Temperature:" + driver.Temperature);
+
+                Thread.Sleep(1000);
+            }
         }
     }
 }
