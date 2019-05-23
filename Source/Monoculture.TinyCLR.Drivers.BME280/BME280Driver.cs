@@ -23,7 +23,7 @@ namespace Monoculture.TinyCLR.Drivers.BME280
 {
     public class BME280Driver
     {
-        private int _tFine;
+        private double _tFine;
         private int _rawHumidity;
         private int _rawPressure;
         private int _rawTemperature;
@@ -61,10 +61,11 @@ namespace Monoculture.TinyCLR.Drivers.BME280
         {
             var settings = new SpiConnectionSettings()
             {
-                ChipSelectType = SpiChipSelectType.Gpio,
+                DataBitLength = 8,
+                ClockFrequency = 500000,
+                ChipSelectActiveState = false,
                 ChipSelectLine = chipSelectLine,
-                Mode = SpiMode.Mode0,
-                DataBitLength = 7
+                ChipSelectType = SpiChipSelectType.Gpio
             };
 
             return settings;
@@ -89,9 +90,9 @@ namespace Monoculture.TinyCLR.Drivers.BME280
 
         public void Initialize()
         {
-            ChipId();
-
             Reset();
+
+            ChipId();
 
             LoadCalibration();
 
@@ -102,32 +103,31 @@ namespace Monoculture.TinyCLR.Drivers.BME280
 
         private void Reset()
         {
-            _device.Write(new byte[] { 0xD0, 0xE0 });
+            _device.WriteRegister(Constants.BME280_REGISTER_SOFTRESET, 0xB6); 
 
-            Thread.Sleep(2);
+            Thread.Sleep(300);
         }
 
         private void ChipId()
         {
-            var buffer = new byte[1];
+            byte chipId = _device.ReadRegister(Constants.BME280_REGISTER_CHIPID);
 
-            _device.WriteRead(new byte[] { 0xD0 }, buffer);
-
-            if (buffer[0] != 0x60)
+            if (chipId != 0x60)
                 throw new ApplicationException("Unrecognized chip");
         }
 
         private void LoadCalibration()
         {
-            var crcBuffer = new byte[1];
-
-            _device.WriteRead(new byte[] { 0xE8 }, crcBuffer);
+            byte crc = _device.ReadRegister(0xE8); 
 
             var calibrationBuffer = new byte[33];
 
-            _device.WriteRead(new byte[] { 0x88 }, 0, 1, calibrationBuffer, 0, 26);
+            var x1 = _device.ReadRegion(0x88, 27);
+            var x2 = _device.ReadRegion(0xE1, 8);
 
-            _device.WriteRead(new byte[] { 0xE1 }, 0, 1, calibrationBuffer, 26, 7);
+            Array.Copy(x1, 0, calibrationBuffer, 0, 26);
+
+            Array.Copy(x2, 0, calibrationBuffer, 26, 7);
                 
              _calibration = new BME280CFData
             {
@@ -151,7 +151,7 @@ namespace Monoculture.TinyCLR.Drivers.BME280
                 H6 = (sbyte)calibrationBuffer[32]
             };
 
-            if (crcBuffer[0] != CalculateCrc(calibrationBuffer))
+            if (crc != CalculateCrc(calibrationBuffer))
                 throw new ApplicationException("CRC error loading configuration.");
         }
 
@@ -209,11 +209,11 @@ namespace Monoculture.TinyCLR.Drivers.BME280
                                  ((byte)OsrPressure << 3) |
                                  (byte)SensorMode);
 
-            var confReg = (byte)((byte)StandbyDuration << 5 | (byte)Filter << 3 | 1);
+            var confReg = (byte)((byte)StandbyDuration << 5 | (byte)Filter << 3 | 0); 
 
-            _device.Write(new byte[] { 0xF2, humiReg });
-            _device.Write(new byte[] { 0xF5, confReg });
-            _device.Write(new byte[] { 0xF4, measReg });
+            _device.WriteRegister(0xF2, humiReg);
+            _device.WriteRegister(0xF5, confReg); 
+            _device.WriteRegister(0xF4, measReg);
         }
 
         private void TakeForcedReading()
@@ -222,19 +222,20 @@ namespace Monoculture.TinyCLR.Drivers.BME280
                                  ((byte)OsrPressure << 3) |
                                  (byte)SensorMode);
 
-            _device.Write(new byte[] { 0xF4, measReg });
+            
+            _device.WriteRegister(Constants.BME280_REGISTER_CONTROL, measReg); 
 
-            Thread.Sleep(2);
+            Thread.Sleep(100);
         }
 
         public void Read()
         {
-            if(SensorMode == BME280SensorMode.Forced)
+            if (SensorMode == BME280SensorMode.Forced)
+            {
                 TakeForcedReading();
+            }
 
-            var buffer = new byte[8];
-
-            _device.WriteRead(new byte[] { 0xF7 }, buffer);
+            var buffer = _device.ReadRegion(Constants.BME280_REGISTER_PRESSUREDATA, 8);
 
             _rawHumidity = buffer[7] | buffer[6] << 8;
 
@@ -250,8 +251,9 @@ namespace Monoculture.TinyCLR.Drivers.BME280
 
             var2 = var2 * var2 * _calibration.T3;
 
-            _tFine = (int)(var1 + var2);
+            _tFine = var1 + var2;
         }
+
 
         public double Temperature
         {
@@ -260,56 +262,64 @@ namespace Monoculture.TinyCLR.Drivers.BME280
                 const double temperatureMin = -40;
                 const double temperatureMax = 85;
 
-                var x = _tFine / 5120.0;
+                var temperature = _tFine / 5120.0;
 
-                if (x < temperatureMin)
-                    x = temperatureMin;
-                else if (x > temperatureMax)
-                    x = temperatureMax;
+                if (temperature < temperatureMin)
+                {
+                    temperature = temperatureMin;
+                }
+                else if (temperature > temperatureMax)
+                {
+                    temperature = temperatureMax;
+                }
 
-                return x;
+                return temperature;
             }
         }
 
-        public float Pressure
+        public double Pressure
         {
             get
             {
-                float pressure;
+                double pressure;
 
-                const float pressureMin = 30000.0f;
-                const float pressureMax = 110000.0f;
+                const double pressureMin = 30000.0;
+                const double pressureMax = 110000.0;
 
-                var var1 = _tFine / 2.0f - 64_000.0f;
+                var var1 = _tFine / 2.0 - 64000.0;
 
-                var var2 = var1 * var1 * _calibration.P6 / 32_768.0f;
+                var var2 = var1 * var1 * _calibration.P6 / 32768.0;
 
-                var2 = var2 + var1 * _calibration.P5 * 2.0f;
+                var2 = var2 + var1 * _calibration.P5 * 2.0;
 
-                var2 = var2 / 4.0f + _calibration.P4 * 65_536.0f;
+                var2 = var2 / 4.0 + _calibration.P4 * 65536.0;
 
-                var var3 = _calibration.P3 * var1 * var1 / 524_288.0f;
+                var var3 = _calibration.P3 * var1 * var1 / 524288.0;
 
-                var1 = (var3 + _calibration.P2 * var1) / 524_288.0f;
+                var1 = (var3 + _calibration.P2 * var1) / 524288.0;
 
-                var1 = (1.0f + var1 / 32_768.0f) * _calibration.P1;
+                var1 = (1.0 + var1 / 32768.0) * _calibration.P1;
 
-                if (var1 > 0)
+                if (var1 != 0)
                 {
-                    pressure = 1_048_576.0f - _rawPressure;
+                    pressure = 1048576.0 - _rawPressure;
 
-                    pressure = (pressure - var2 / 4_096.0f) * 6_250.0f / var1;
+                    pressure = (pressure - var2 / 4096.0) * 6250.0 / var1;
 
-                    var1 = _calibration.P9 * pressure * pressure / 2_147_483_648.0f;
+                    var1 = _calibration.P9 * pressure * pressure / 2147483648.0;
 
-                    var2 = pressure * _calibration.P8 / 32_768.0f;
+                    var2 = pressure * _calibration.P8 / 2768.0;
 
-                    pressure = pressure + (var1 + var2 + _calibration.P7) / 16.0f;
+                    pressure = pressure + (var1 + var2 + _calibration.P7) / 16.0;
 
                     if (pressure < pressureMin)
+                    {
                         pressure = pressureMin;
+                    }
                     else if (pressure > pressureMax)
+                    {
                         pressure = pressureMax;
+                    }
                 }
                 else
                 {
@@ -320,33 +330,37 @@ namespace Monoculture.TinyCLR.Drivers.BME280
             }
         }
 
-        public float Humidity
+        public double Humidity
         {
             get
             {
-                const float humidityMin = 0.0f;
-                const float humidityMax = 100.0f;
+                const double humidityMin = 0.0;
+                const double humidityMax = 100.0;
 
-                var var1 = _tFine - 76800.0f;
+                var var1 = _tFine - 76800.0;
 
-                var var2 = _calibration.H4 * 64.0f + _calibration.H5 / 16384.0f * var1;
+                var var2 = _calibration.H4 * 64.0 + _calibration.H5 / 16384.0 * var1;
 
                 var var3 = _rawHumidity - var2;
 
-                var var4 = _calibration.H2 / 65536.0f;
+                var var4 = _calibration.H2 / 65536.0;
 
-                var var5 = 1.0f + _calibration.H3 / 67108864.0f * var1;
+                var var5 = 1.0 + _calibration.H3 / 67108864.0 * var1;
 
-                var var6 = 1.0f + _calibration.H6 / 67108864.0f * var1 * var5;
+                var var6 = 1.0 + _calibration.H6 / 67108864.0 * var1 * var5;
 
                 var6 = var3 * var4 * (var5 * var6);
 
-                var humidity = var6 * (1.0f - _calibration.H1 * var6 / 524288.0f);
+                var humidity = var6 * (1.0 - _calibration.H1 * var6 / 524288.0);
 
                 if (humidity > humidityMax)
+                {
                     humidity = humidityMax;
+                }
                 else if (humidity < humidityMin)
+                {
                     humidity = humidityMin;
+                }
 
                 return humidity;
             }
