@@ -103,31 +103,31 @@ namespace Monoculture.TinyCLR.Drivers.BME280
 
         private void Reset()
         {
-            _device.WriteRegister(Constants.BME280_REGISTER_SOFTRESET, 0xB6); 
+            _device.WriteRegister(BME280Constants.BME280_REG_RESET, BME280Constants.BME280_CMD_SOFTRESET); 
 
             Thread.Sleep(300);
         }
 
         private void ChipId()
         {
-            byte chipId = _device.ReadRegister(Constants.BME280_REGISTER_CHIPID);
+            byte chipId = _device.ReadRegister(BME280Constants.BME280_REG_CHIPID);
 
-            if (chipId != 0x60)
+            if (chipId != BME280Constants.BME280_CHIP_ID)
                 throw new ApplicationException("Unrecognized chip");
         }
 
         private void LoadCalibration()
         {
-            byte crc = _device.ReadRegister(0xE8); 
+            byte crc = _device.ReadRegister(BME280Constants.BME280_REG_CALIB_CRC); 
 
             var calibrationBuffer = new byte[33];
 
-            var x1 = _device.ReadRegion(0x88, 27);
-            var x2 = _device.ReadRegion(0xE1, 8);
+            var calibrationData1 = _device.ReadRegion(BME280Constants.BME280_REG_CALIB2_ADD, 27);
+            var calibrationData2 = _device.ReadRegion(BME280Constants.BME280_REG_CALIB1_ADD, 8);
 
-            Array.Copy(x1, 0, calibrationBuffer, 0, 26);
+            Array.Copy(calibrationData1, 0, calibrationBuffer, 0, 26);
 
-            Array.Copy(x2, 0, calibrationBuffer, 26, 7);
+            Array.Copy(calibrationData2, 0, calibrationBuffer, 26, 7);
                 
              _calibration = new BME280CFData
             {
@@ -211,9 +211,9 @@ namespace Monoculture.TinyCLR.Drivers.BME280
 
             var confReg = (byte)((byte)StandbyDuration << 5 | (byte)Filter << 3 | 0); 
 
-            _device.WriteRegister(0xF2, humiReg);
-            _device.WriteRegister(0xF5, confReg); 
-            _device.WriteRegister(0xF4, measReg);
+            _device.WriteRegister(BME280Constants.BME280_REG_CTRL_HUM, humiReg);
+            _device.WriteRegister(BME280Constants.BME280_REG_CONFIG, confReg); 
+            _device.WriteRegister(BME280Constants.BME280_REG_CTRL_MEAS, measReg);
         }
 
         private void TakeForcedReading()
@@ -223,7 +223,7 @@ namespace Monoculture.TinyCLR.Drivers.BME280
                                  (byte)SensorMode);
 
             
-            _device.WriteRegister(Constants.BME280_REGISTER_CONTROL, measReg); 
+            _device.WriteRegister(BME280Constants.BME280_REG_CTRL_MEAS, measReg); 
 
             Thread.Sleep(100);
         }
@@ -235,7 +235,7 @@ namespace Monoculture.TinyCLR.Drivers.BME280
                 TakeForcedReading();
             }
 
-            var buffer = _device.ReadRegion(Constants.BME280_REGISTER_PRESSUREDATA, 8);
+            var buffer = _device.ReadRegion(BME280Constants.BME280_REG_PRE_MSB, 8);
 
             _rawHumidity = buffer[7] | buffer[6] << 8;
 
@@ -308,7 +308,7 @@ namespace Monoculture.TinyCLR.Drivers.BME280
 
                     var1 = _calibration.P9 * pressure * pressure / 2147483648.0;
 
-                    var2 = pressure * _calibration.P8 / 2768.0;
+                    var2 = pressure * _calibration.P8 / 32768.0;
 
                     pressure = pressure + (var1 + var2 + _calibration.P7) / 16.0;
 

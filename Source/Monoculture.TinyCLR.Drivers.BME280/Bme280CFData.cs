@@ -36,6 +36,5 @@ namespace Monoculture.TinyCLR.Drivers.BME280
         public short H4 { get; set; }
         public short H5 { get; set; }
         public sbyte H6 { get; set; }
-
     }
 }
