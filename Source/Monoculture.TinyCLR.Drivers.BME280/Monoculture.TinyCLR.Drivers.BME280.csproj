@@ -43,7 +43,7 @@
     <Compile Include="BME280OverSample.cs" />
     <Compile Include="BME280SensorMode.cs" />
     <Compile Include="BME280StandbyTime.cs" />
-    <Compile Include="Constants.cs" />
+    <Compile Include="BME280Constants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
