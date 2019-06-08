@@ -12,7 +12,7 @@ variables:
   BuildConfiguration: 'Release'
   MajorVersion: 2
   MinorVersion: 1
-  PatchVersion: 1
+  PatchVersion: 2
   
 steps:
 - task: NuGetToolInstaller@0
