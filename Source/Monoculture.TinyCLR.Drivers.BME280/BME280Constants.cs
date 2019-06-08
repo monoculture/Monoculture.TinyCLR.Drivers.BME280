@@ -16,12 +16,18 @@
         public const byte BME280_REG_CTRL_HUM = 0xF2;
         public const byte BME280_REG_RESET = 0xE0;
         public const byte BME280_REG_CHIPID = 0xD0;
-        public const byte BME280_REG_CALIB1_ADD = 0xE1;
-        public const byte BME280_REG_CALIB2_ADD  = 0X88;
-        public const byte BME280_REG_CALIB_CRC = 0xE8;
+
+        public const byte BME280_CRC_DATA_ADDR = 0xE8;
+        public const byte BME280_CRC_DATA_LEN = 1;
+        public const byte BME280_CRC_CALIB1_ADDR = 0x88;
+        public const byte BME280_CRC_CALIB1_LEN = 26;
+        public const byte BME280_CRC_CALIB2_ADDR = 0xE1;
+        public const byte BME280_CRC_CALIB2_LEN = 7;
 
         public const byte BME280_CMD_SOFTRESET = 0xB6;
 
         public const byte BME280_CHIP_ID = 0x60;
+
+
     }
 }
