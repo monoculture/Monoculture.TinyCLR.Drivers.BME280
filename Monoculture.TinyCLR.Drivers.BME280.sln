@@ -20,6 +20,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sources", "Sources", "{6BEC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3840A7D6-DCF2-4D94-A15A-74A28FBCE0B0}"
 	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
 		LICENSE = LICENSE
 		Source\Monoculture.TinyCLR.Drivers.BME280\Monoculture.TinyCLR.Drivers.BME280.nuspec = Source\Monoculture.TinyCLR.Drivers.BME280\Monoculture.TinyCLR.Drivers.BME280.nuspec
 		README.md = README.md
